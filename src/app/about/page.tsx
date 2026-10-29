@@ -25,7 +25,7 @@ export default function About() {
         <h2 className="font-display text-2xl">How we procure</h2>
         <p>Regional curation teams visit clusters. Artisans are onboarded with transparent agreements. Goods move to Mumbai/Delhi hubs, graded into three quality tiers — luxury/export, standard, and accessible — so nothing is wasted.</p>
         <h2 className="font-display text-2xl">The apps</h2>
-        <p>Customers shop like Amazon. Artisans use a simple seller app with income, listings, tracking, savings and an SOS button. Super Admin runs the house — catalogue, warehouse, export desk, SOS inbox.</p>
+        <p>Customers shop like Amazon. Every piece carries the artisan’s story, GI tag where it applies, and a fair split that keeps 70–80% with the maker. We ship plastic-free from 29 states to your door.</p>
         <div className="flex gap-3">
           <Link href="/shop" className="px-5 py-2.5 rounded-full bg-maroon-700 text-cream-50">Shop the house</Link>
           <Link href="/seller" className="px-5 py-2.5 rounded-full border border-maroon-300">Become a seller</Link>

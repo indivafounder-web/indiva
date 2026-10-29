@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { q, one, run } from "@/lib/db";
+import { q, one, run, getSettings } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { slugify } from "@/lib/utils";
 
@@ -72,6 +72,10 @@ export async function POST(req: Request) {
   const s = await getSession();
   if (!s || (s.role !== "admin" && s.role !== "seller")) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  const settings = await getSettings();
+  if (settings.pause_listings === "1" && s.role !== "admin") {
+    return NextResponse.json({ error: "New listings are paused by company command." }, { status: 423 });
   }
   const b = await req.json();
   const name = String(b.name || "").trim();

@@ -48,7 +48,7 @@ const FAQ: Array<[string[], string]> = [
   [["gi", "authentic", "fake", "original"], "GI-tagged pieces carry a digital passport. Open the product → Product passport, or scan the QR in the box."],
   [["return", "refund"], "Unused goods can be returned in 7 days. Start a return from Your Orders."],
   [["export", "usa", "uk", "ship", "international"], "We ship to US, UK, UAE, Canada, Singapore, Australia, EU and Japan. Checkout → change country. Global 7–14 days."],
-  [["artisan", "seller", "earn"], "70–80% of every sale goes to the maker. Artisans use /seller for income, listings and SOS."],
+  [["artisan", "seller", "earn"], "70–80% of every sale goes to the maker. Every piece carries the artisan’s name and village."],
   [["plus", "prime", "membership"], "INDIVA Atelier is our membership — free festival shipping, early access to state-of-the-month, and artisan stories first."],
   [["pay", "upi", "card"], "UPI, cards, net banking and COD in India. International cards on export checkout."],
 ];

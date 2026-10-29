@@ -12,14 +12,10 @@ const DEPTS = [
   { href: "/shop?category=gourmet", label: "Gourmet" },
   { href: "/shop?category=wellness", label: "Wellness" },
   { href: "/shop?category=lifestyle", label: "Jewelry" },
-  { href: "/map", label: "29 States" },
+  { href: "/map", label: "Shop by State" },
   { href: "/shop?gi=1", label: "GI Tagged" },
-  { href: "/hampers", label: "Hampers" },
+  { href: "/hampers", label: "Gift hampers" },
   { href: "/live", label: "Live workshops" },
-  { href: "/export", label: "Export" },
-  { href: "/b2b", label: "B2B" },
-  { href: "/atelier", label: "Atelier" },
-  { href: "/features", label: "All 100 features" },
 ];
 
 export default function Header({
@@ -167,8 +163,6 @@ export default function Header({
               {d.label}
             </Link>
           ))}
-          {user?.role === "admin" ? <Link href="/admin" className="shrink-0 text-[#febd69]">Super Admin</Link> : null}
-          {user?.role === "seller" ? <Link href="/seller" className="shrink-0 text-[#febd69]">Seller</Link> : null}
         </div>
       </div>
 
@@ -187,12 +181,12 @@ export default function Header({
                   {d.label}
                 </Link>
               ))}
-              <p className="font-bold mt-4 mb-2">Programmes</p>
+              <p className="font-bold mt-4 mb-2">Help</p>
               {[
-                ["/features", "100 future-ready features"],
-                ["/seller", "Sell on INDIVA"],
-                ["/impact", "Impact & ESG"],
-                ["/about", "Our movement"],
+                ["/about", "Our story"],
+                ["/impact", "Sustainability"],
+                ["/tracking", "Track a parcel"],
+                ["/orders", "Your orders"],
               ].map(([h, l]) => (
                 <Link key={h} href={h} onClick={() => setMenu(false)} className="block py-2 border-b border-gray-100">{l}</Link>
               ))}

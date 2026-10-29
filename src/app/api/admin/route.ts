@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
-import { q, one, run, getDbInfo } from "@/lib/db";
+import { q, one, run, getDbInfo, getSettings } from "@/lib/db";
 
 async function admin() {
   const s = await getSession();
@@ -47,7 +47,7 @@ export async function GET() {
   );
   return NextResponse.json({
     stats, recentOrders, topProducts, artisans, sos, products, orders, customers,
-    warehouses, inventory, categories, states, salesByDay, db: getDbInfo(),
+    warehouses, inventory, categories, states, salesByDay, db: getDbInfo(), settings: await getSettings(),
   });
 }
 
@@ -74,6 +74,10 @@ export async function POST(req: Request) {
     await run("UPDATE inventory SET qty=? WHERE id=?", [b.qty, b.id]);
   } else if (action === "user_role") {
     await run("UPDATE users SET role=? WHERE id=?", [b.role, b.id]);
+  } else if (action === "setting") {
+    await run("UPDATE company_settings SET value=? WHERE key=?", [String(b.value ?? ""), b.key]);
+  } else if (action === "broadcast") {
+    await run("UPDATE company_settings SET value=? WHERE key=?", [b.message || "", "announcement"]);
   }
   return NextResponse.json({ ok: true });
 }

@@ -243,11 +243,11 @@ export default async function Home() {
             <p className="text-xs tracking-[0.25em] uppercase text-maroon-500">Direct from the loom</p>
             <h2 className="font-display text-3xl mt-1">No middlemen. 70–80% to the maker.</h2>
             <p className="mt-4 text-maroon-700 leading-relaxed">
-              We onboard artisans through transparent agreements, GI tagging and quality tiers — luxury for the world, fair price at home. The seller app tracks income, savings, orders and has an SOS button so no craftsperson is alone.
+              We onboard artisans through transparent agreements, GI tagging and quality tiers — luxury for the world, fair price at home. Every maker is paid fairly, with savings and a safety line so no craftsperson is left alone.
             </p>
             <div className="mt-5 flex gap-3">
-              <Link href="/about" className="px-5 py-2.5 rounded-full bg-maroon-700 text-cream-50">Our movement</Link>
-              <Link href="/seller" className="px-5 py-2.5 rounded-full border border-maroon-300">Seller app</Link>
+              <Link href="/about" className="px-5 py-2.5 rounded-full bg-maroon-700 text-cream-50">Our story</Link>
+              <Link href="/impact" className="px-5 py-2.5 rounded-full border border-maroon-300">Sustainability</Link>
             </div>
           </div>
         </div>

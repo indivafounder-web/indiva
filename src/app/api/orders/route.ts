@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { getSession } from "@/lib/auth";
-import { q, one, run } from "@/lib/db";
+import { q, one, run, getSettings } from "@/lib/db";
 import { orderNo } from "@/lib/utils";
 
 export async function GET() {
@@ -17,6 +17,10 @@ export async function GET() {
 export async function POST(req: Request) {
   const s = await getSession();
   if (!s) return NextResponse.json({ error: "Please sign in to checkout" }, { status: 401 });
+  const settings = await getSettings();
+  if (settings.freeze_store === "1") {
+    return NextResponse.json({ error: "Checkout is temporarily paused by INDIVA." }, { status: 423 });
+  }
   const body = await req.json();
   const sid = cookies().get("indiva_sid")?.value || "";
   let items = await q<any>(

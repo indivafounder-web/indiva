@@ -1,9 +1,7 @@
 import Link from "next/link";
 import Logo from "./Logo";
-import { FEATURES } from "@/lib/features";
 
 export default function Footer() {
-  const pillars = ["Customer", "Artisan", "Export", "Intelligence"] as const;
   return (
     <footer className="mt-10 bg-[#232f3e] text-gray-200 text-sm">
       <a href="#top" className="block text-center py-3 bg-[#37475a] hover:bg-[#485769] text-white text-sm">
@@ -13,27 +11,43 @@ export default function Footer() {
         <div>
           <Logo light />
           <p className="mt-3 text-[#febd69] italic">One India. One Store. One Experience.</p>
-          <p className="mt-2 text-gray-400">Luxury crafts from 29 states. Direct from the maker. GI tagged. Export ready.</p>
-          <div className="mt-4 flex flex-col gap-1">
-            <Link href="/about">About INDIVA</Link>
-            <Link href="/features">100 future-ready features</Link>
-            <Link href="/impact">Impact & ESG</Link>
-            <Link href="/seller">Sell on INDIVA</Link>
-          </div>
+          <p className="mt-2 text-gray-400">Authentic crafts from every Indian state. GI tagged. Plastic-free packing.</p>
         </div>
-        {pillars.map((p) => (
-          <div key={p}>
-            <h4 className="font-bold text-white mb-3">{p}</h4>
-            <ul className="space-y-1 text-gray-300">
-              {FEATURES.filter((f) => f.pillar === p).slice(0, 8).map((f) => (
-                <li key={f.n}><Link href={f.href} className="hover:underline">{f.title}</Link></li>
-              ))}
-            </ul>
-          </div>
-        ))}
+        <div>
+          <h4 className="font-bold text-white mb-3">Shop</h4>
+          <ul className="space-y-1">
+            <li><Link href="/shop?category=fashion">Fashion & Textiles</Link></li>
+            <li><Link href="/shop?category=decor">Home & Décor</Link></li>
+            <li><Link href="/shop?category=gourmet">Gourmet</Link></li>
+            <li><Link href="/shop?category=wellness">Wellness</Link></li>
+            <li><Link href="/shop?category=lifestyle">Jewelry</Link></li>
+            <li><Link href="/states">Shop by State</Link></li>
+            <li><Link href="/hampers">Gift hampers</Link></li>
+          </ul>
+        </div>
+        <div>
+          <h4 className="font-bold text-white mb-3">Help</h4>
+          <ul className="space-y-1">
+            <li><Link href="/tracking">Track a parcel</Link></li>
+            <li><Link href="/orders">Your orders</Link></li>
+            <li><Link href="/account">Your account</Link></li>
+            <li><Link href="/about">Our story</Link></li>
+            <li><Link href="/impact">Sustainability</Link></li>
+          </ul>
+        </div>
+        <div>
+          <h4 className="font-bold text-white mb-3">Trust</h4>
+          <ul className="space-y-1 text-gray-300">
+            <li>GI-tagged authenticity</li>
+            <li>Artisan story on every piece</li>
+            <li>70–80% to the maker</li>
+            <li>Plastic-free packaging</li>
+            <li>Easy returns on unused goods</li>
+          </ul>
+        </div>
       </div>
       <div className="border-t border-white/10 py-4 text-center text-xs text-gray-400">
-        © {new Date().getFullYear()} INDIVA · Essence of Every State. Elegance for the World.
+        © {new Date().getFullYear()} INDIVA
       </div>
     </footer>
   );

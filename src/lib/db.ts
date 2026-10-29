@@ -268,6 +268,10 @@ CREATE TABLE IF NOT EXISTS savings_tx (
   note TEXT,
   created_at TEXT DEFAULT (datetime('now'))
 );
+CREATE TABLE IF NOT EXISTS company_settings (
+  key TEXT PRIMARY KEY,
+  value TEXT
+);
 `;
 
 async function openConnections() {
@@ -358,6 +362,41 @@ async function init() {
     },
   };
   await seedIfEmpty(seedClient);
+  const defaults: Array<[string, string]> = [
+    ["freeze_store", "0"],
+    ["pause_listings", "0"],
+    ["lock_payouts", "0"],
+    ["takeover", "0"],
+    ["announcement", ""],
+  ];
+  for (const [k, v] of defaults) {
+    const ex = await raw("SELECT key FROM company_settings WHERE key=?", [k]);
+    if (!ex.rows.length) await raw("INSERT INTO company_settings (key,value) VALUES (?,?)", [k, v]);
+  }
+}
+
+async function ensureSettings() {
+  await raw("CREATE TABLE IF NOT EXISTS company_settings (key TEXT PRIMARY KEY, value TEXT)");
+  const defaults: Array<[string, string]> = [
+    ["freeze_store", "0"],
+    ["pause_listings", "0"],
+    ["lock_payouts", "0"],
+    ["takeover", "0"],
+    ["announcement", ""],
+  ];
+  for (const [k, v] of defaults) {
+    const ex = await raw("SELECT key FROM company_settings WHERE key=?", [k]);
+    if (!ex.rows.length) await raw("INSERT INTO company_settings (key,value) VALUES (?,?)", [k, v]);
+  }
+}
+
+export async function getSettings() {
+  await ensureDb();
+  await ensureSettings();
+  const res = await raw("SELECT key, value FROM company_settings");
+  const o: Record<string, string> = {};
+  for (const r of res.rows) o[r.key] = r.value;
+  return o;
 }
 
 export function ensureDb() {

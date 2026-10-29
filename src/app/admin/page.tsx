@@ -6,24 +6,24 @@ import Logo from "@/components/Logo";
 import { inr } from "@/lib/utils";
 import {
   LayoutDashboard, Package, ShoppingBag, Users, Warehouse, Globe2,
-  Bell, BarChart3, LogOut, Check, X, Pencil, Trash2, AlertTriangle,
+  Bell, BarChart3, LogOut, AlertTriangle, Shield, Landmark, SlidersHorizontal, Trash2,
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 
 const NAV = [
-  { id: "overview", icon: LayoutDashboard, label: "Overview" },
-  { id: "products", icon: Package, label: "Catalogue" },
+  { id: "command", icon: LayoutDashboard, label: "Command" },
+  { id: "takeover", icon: Shield, label: "Takeover" },
+  { id: "people", icon: Users, label: "People & roles" },
+  { id: "finance", icon: Landmark, label: "Finance" },
   { id: "orders", icon: ShoppingBag, label: "Orders" },
-  { id: "artisans", icon: Users, label: "Artisans" },
-  { id: "customers", icon: Users, label: "People" },
-  { id: "inventory", icon: Warehouse, label: "Warehouse" },
-  { id: "export", icon: Globe2, label: "Export desk" },
-  { id: "sos", icon: Bell, label: "SOS inbox" },
-  { id: "analytics", icon: BarChart3, label: "Analytics" },
+  { id: "export", icon: Globe2, label: "Export & compliance" },
+  { id: "sos", icon: Bell, label: "Crisis / SOS" },
+  { id: "ops", icon: Warehouse, label: "House ops" },
+  { id: "settings", icon: SlidersHorizontal, label: "Company" },
 ];
 
 export default function Admin() {
-  const [tab, setTab] = useState("overview");
+  const [tab, setTab] = useState("command");
   const [data, setData] = useState<any>(null);
   const [err, setErr] = useState("");
   const [user, setUser] = useState<any>(null);
@@ -33,7 +33,7 @@ export default function Admin() {
     const me = await fetch("/api/auth/me").then((r) => r.json());
     setUser(me.user);
     if (!me.user) { router.replace("/login?next=/admin"); return; }
-    if (me.user.role !== "admin") { setErr("Super Admin only. Sign in as admin@indiva.in"); return; }
+    if (me.user.role !== "admin") { setErr("This desk is restricted to the INDIVA Super Admin."); return; }
     const r = await fetch("/api/admin");
     if (!r.ok) { setErr("Could not load admin data"); return; }
     setData(await r.json());
@@ -49,7 +49,7 @@ export default function Admin() {
     return (
       <div className="min-h-dvh flex items-center justify-center p-8">
         <div className="bg-white border rounded-2xl p-8 max-w-md text-center">
-          <p className="font-display text-2xl">INDIVA Super Admin</p>
+          <p className="font-display text-2xl">INDIVA command</p>
           <p className="mt-3 text-maroon-700">{err}</p>
           <Link href="/login?next=/admin" className="mt-4 inline-block px-5 py-2 rounded-full bg-maroon-700 text-white">Sign in</Link>
         </div>
@@ -64,7 +64,7 @@ export default function Admin() {
     <div className="min-h-dvh bg-[#1c120c] text-cream-100 flex">
       <aside className="w-56 shrink-0 bg-[#140d09] border-r border-white/10 hidden md:flex flex-col">
         <div className="p-5"><Logo light size={22} /></div>
-        <p className="px-5 text-[10px] tracking-[0.25em] uppercase text-gold-300 mb-3">Super Admin</p>
+        <p className="px-5 text-[10px] tracking-[0.25em] uppercase text-gold-300 mb-3">CEO desk</p>
         <nav className="flex-1 px-2 space-y-0.5">
           {NAV.map((n) => (
             <button key={n.id} onClick={() => setTab(n.id)} className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${tab === n.id ? "bg-maroon-700 text-white" : "hover:bg-white/5"}`}>
@@ -91,15 +91,15 @@ export default function Admin() {
           </div>
         </header>
         <div className="p-6">
-          {tab === "overview" && <Overview data={data} />}
-          {tab === "products" && <Products data={data} act={act} />}
+          {tab === "command" && <Command data={data} />}
+          {tab === "takeover" && <Takeover data={data} act={act} />}
+          {tab === "people" && <People data={data} act={act} />}
+          {tab === "finance" && <Finance data={data} />}
           {tab === "orders" && <Orders data={data} act={act} />}
-          {tab === "artisans" && <Artisans data={data} act={act} />}
-          {tab === "customers" && <People data={data} act={act} />}
-          {tab === "inventory" && <Inventory data={data} act={act} />}
           {tab === "export" && <Export data={data} act={act} />}
           {tab === "sos" && <Sos data={data} act={act} />}
-          {tab === "analytics" && <Analytics data={data} />}
+          {tab === "ops" && <Ops data={data} act={act} />}
+          {tab === "settings" && <Company data={data} act={act} />}
         </div>
       </main>
     </div>
@@ -115,30 +115,53 @@ function Stat({ l, v }: { l: string; v: any }) {
   );
 }
 
-function Overview({ data }: { data: any }) {
+function Command({ data }: { data: any }) {
   const s = data.stats;
   const db = data.db || {};
+  const set = data.settings || {};
+  const flags = [
+    ["Storefront", set.freeze_store === "1" ? "FROZEN" : "Live"],
+    ["Listings", set.pause_listings === "1" ? "Paused" : "Open"],
+    ["Payouts", set.lock_payouts === "1" ? "Locked" : "Running"],
+    ["Takeover", set.takeover === "1" ? "ACTIVE" : "Standby"],
+  ];
   return (
     <div className="space-y-6">
+      <div>
+        <p className="text-[11px] uppercase tracking-[0.3em] text-gold-300">Chief Executive</p>
+        <h2 className="font-display text-3xl mt-1">Company command</h2>
+        <p className="text-cream-200/80 mt-2 max-w-2xl text-sm">
+          This desk is not a catalogue. It is the operating system of INDIVA — freeze the store, lock money, reassign people, and take control of any seller or warehouse in one move.
+        </p>
+      </div>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        {flags.map(([l, v]) => (
+          <div key={l} className="rounded-2xl border border-white/10 bg-white/5 p-4">
+            <p className="text-[11px] uppercase tracking-wider text-gold-300">{l}</p>
+            <p className="font-display text-2xl mt-1">{v}</p>
+          </div>
+        ))}
+      </div>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <Stat l="GMV" v={inr(s.revenue)} />
+        <Stat l="Open orders" v={s.orders} />
+        <Stat l="People on payroll" v={s.artisans} />
+        <Stat l="Crisis tickets" v={s.sos} />
+      </div>
+      {set.announcement ? (
+        <div className="rounded-2xl border border-gold-400/40 bg-gold-400/10 p-4 text-sm">
+          Live company notice: {set.announcement}
+        </div>
+      ) : null}
       <div className={`rounded-2xl p-4 border ${db.persistent ? "bg-emerald-900/30 border-emerald-500/30" : "bg-amber-900/30 border-amber-400/40"}`}>
-        <p className="text-[11px] uppercase tracking-wider text-gold-300">SQL database</p>
+        <p className="text-[11px] uppercase tracking-wider text-gold-300">Treasury database</p>
         <p className="font-display text-xl mt-1">{db.label || "Local SQLite"}</p>
         <p className="text-sm text-cream-200/80 mt-1">{db.host}</p>
         <p className="text-xs mt-2 text-cream-300/80">{db.hint}</p>
       </div>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <Stat l="GMV" v={inr(s.revenue)} />
-        <Stat l="Orders" v={s.orders} />
-        <Stat l="Live SKUs" v={s.products} />
-        <Stat l="Artisans" v={s.artisans} />
-        <Stat l="Customers" v={s.customers} />
-        <Stat l="Pending listings" v={s.pending} />
-        <Stat l="Open SOS" v={s.sos} />
-        <Stat l="Export orders" v={s.exportOrders} />
-      </div>
       <div className="grid lg:grid-cols-2 gap-4">
         <div className="bg-white/5 border border-white/10 rounded-2xl p-4 h-72">
-          <p className="text-sm mb-2">Revenue by day</p>
+          <p className="text-sm mb-2">Cash in, last 14 days</p>
           <ResponsiveContainer width="100%" height="90%">
             <BarChart data={[...data.salesByDay].reverse()}>
               <CartesianGrid strokeDasharray="3 3" stroke="#ffffff15" />
@@ -150,7 +173,7 @@ function Overview({ data }: { data: any }) {
           </ResponsiveContainer>
         </div>
         <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
-          <p className="text-sm mb-3">Latest orders</p>
+          <p className="text-sm mb-3">Latest money movement</p>
           <ul className="space-y-2 text-sm">
             {data.recentOrders.map((o: any) => (
               <li key={o.id} className="flex justify-between border-b border-white/5 pb-2">
@@ -161,6 +184,134 @@ function Overview({ data }: { data: any }) {
             ))}
           </ul>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function Takeover({ data, act }: { data: any; act: any }) {
+  const set = data.settings || {};
+  const on = (k: string) => set[k] === "1";
+  function toggle(k: string) {
+    act({ action: "setting", key: k, value: on(k) ? "0" : "1" });
+  }
+  const levers = [
+    { key: "takeover", title: "Full company takeover", copy: "CEO override. Every seller desk, warehouse, and listing answers to this account until you stand down." },
+    { key: "freeze_store", title: "Freeze storefront", copy: "Checkout and new orders stop. The public site stays visible as a holding page." },
+    { key: "pause_listings", title: "Pause all listings", copy: "No new SKUs go live. Existing catalogue remains until you unpause." },
+    { key: "lock_payouts", title: "Lock payouts", copy: "Artisan and seller remittances are held in escrow until you release them." },
+  ];
+  return (
+    <div className="space-y-6">
+      <div>
+        <p className="text-[11px] uppercase tracking-[0.3em] text-gold-300">Emergency powers</p>
+        <h2 className="font-display text-3xl mt-1">Takeover</h2>
+        <p className="text-cream-200/80 mt-2 max-w-2xl text-sm">
+          These switches are company-wide. Use them when a partner, payment rail, or warehouse must be taken off the floor without waiting for anyone else.
+        </p>
+      </div>
+      <div className="grid md:grid-cols-2 gap-4">
+        {levers.map((l) => (
+          <div key={l.key} className="rounded-2xl border border-white/10 bg-white/5 p-5">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="font-display text-xl">{l.title}</p>
+                <p className="text-sm text-cream-200/75 mt-2">{l.copy}</p>
+              </div>
+              <button
+                onClick={() => toggle(l.key)}
+                className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold ${on(l.key) ? "bg-red-500 text-white" : "bg-emerald-700 text-white"}`}
+              >
+                {on(l.key) ? "ON" : "OFF"}
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+        <p className="font-display text-xl mb-2">Assume a seller desk</p>
+        <p className="text-sm text-cream-200/75 mb-4">Promote or demote any account. Super Admin stays with you.</p>
+        <div className="overflow-auto">
+          <table className="w-full text-sm">
+            <thead className="text-gold-200 text-left"><tr><th className="p-2">Person</th><th>Role</th><th></th></tr></thead>
+            <tbody>
+              {data.customers.map((u: any) => (
+                <tr key={u.id} className="border-t border-white/5">
+                  <td className="p-2">{u.name}<span className="block text-[11px] text-cream-300/60">{u.email}</span></td>
+                  <td className="p-2">{u.role}</td>
+                  <td className="p-2">
+                    <select value={u.role} onChange={(e) => act({ action: "user_role", id: u.id, role: e.target.value })} className="bg-transparent border border-white/10 rounded px-1">
+                      {["customer", "seller", "admin"].map((r) => <option key={r} className="text-ink" value={r}>{r}</option>)}
+                    </select>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Finance({ data }: { data: any }) {
+  const s = data.stats;
+  const gmv = Number(s.revenue || 0);
+  return (
+    <div className="space-y-6">
+      <div>
+        <p className="text-[11px] uppercase tracking-[0.3em] text-gold-300">Treasury</p>
+        <h2 className="font-display text-3xl mt-1">Finance</h2>
+      </div>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <Stat l="Gross merchandise" v={inr(gmv)} />
+        <Stat l="Platform take (~18%)" v={inr(Math.round(gmv * 0.18))} />
+        <Stat l="Artisan share (~70%)" v={inr(Math.round(gmv * 0.7))} />
+        <Stat l="Held in escrow" v={data.settings?.lock_payouts === "1" ? inr(Math.round(gmv * 0.7)) : inr(0)} />
+      </div>
+      <div className="bg-white/5 border border-white/10 rounded-2xl p-4 h-80">
+        <p className="text-sm mb-2">Daily GMV</p>
+        <ResponsiveContainer width="100%" height="90%">
+          <BarChart data={[...data.salesByDay].reverse()}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#ffffff15" />
+            <XAxis dataKey="d" stroke="#e8d5a3" tick={{ fontSize: 10 }} />
+            <YAxis stroke="#e8d5a3" tick={{ fontSize: 10 }} />
+            <Tooltip />
+            <Bar dataKey="revenue" fill="#c4a35a" radius={[4, 4, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  );
+}
+
+function Ops({ data, act }: { data: any; act: any }) {
+  return (
+    <div className="space-y-10">
+      <div>
+        <p className="text-[11px] uppercase tracking-[0.3em] text-gold-300">Operations</p>
+        <h2 className="font-display text-3xl mt-1 mb-2">House ops</h2>
+        <p className="text-sm text-cream-200/75 mb-6">Catalogue, artisans, and warehouses live here — subordinate to Command, not the home screen.</p>
+      </div>
+      <Products data={data} act={act} />
+      <Artisans data={data} act={act} />
+      <Inventory data={data} act={act} />
+    </div>
+  );
+}
+
+function Company({ data, act }: { data: any; act: any }) {
+  const [msg, setMsg] = useState(data.settings?.announcement || "");
+  return (
+    <div className="space-y-6">
+      <div>
+        <p className="text-[11px] uppercase tracking-[0.3em] text-gold-300">Company</p>
+        <h2 className="font-display text-3xl mt-1">Broadcast & policy</h2>
+      </div>
+      <div className="rounded-2xl border border-white/10 bg-white/5 p-5 space-y-3">
+        <p className="text-sm">Company-wide notice (shown on the command desk)</p>
+        <textarea value={msg} onChange={(e) => setMsg(e.target.value)} rows={3} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm" />
+        <button onClick={() => act({ action: "broadcast", message: msg })} className="px-4 py-2 rounded-lg bg-gold-400 text-maroon-900 text-sm font-semibold">Publish notice</button>
       </div>
     </div>
   );
@@ -288,6 +439,10 @@ function Artisans({ data, act }: any) {
 
 function People({ data, act }: any) {
   return (
+    <div>
+      <p className="text-[11px] uppercase tracking-[0.3em] text-gold-300">Directory</p>
+      <h2 className="font-display text-3xl mt-1 mb-4">People & roles</h2>
+      <p className="text-sm text-cream-200/75 mb-6">Assign who can sell, who can shop, and who sits at this desk. Super Admin is the CEO role.</p>
     <table className="w-full text-sm">
       <thead className="text-gold-200 text-left"><tr><th className="p-2">Name</th><th>Email</th><th>Role</th></tr></thead>
       <tbody>
@@ -304,6 +459,7 @@ function People({ data, act }: any) {
         ))}
       </tbody>
     </table>
+    </div>
   );
 }
 

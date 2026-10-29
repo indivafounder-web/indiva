@@ -31,8 +31,8 @@ export default function Account() {
     { href: "/shop", icon: Store, t: "Keep shopping", d: "29 states, one cart" },
     { href: "/export", icon: MapPin, t: "Export desk", d: "Ship outside India" },
   ];
-  if (user.role === "admin") cards.push({ href: "/admin", icon: Shield, t: "Super Admin", d: "Run the house" });
-  if (user.role === "seller" || user.role === "admin") cards.push({ href: "/seller", icon: Store, t: "Seller app", d: "Income, listings, SOS" });
+  if (user.role === "admin") cards.push({ href: "/admin", icon: Shield, t: "CEO command", d: "Takeover, people, finance, crisis" });
+  if (user.role === "seller" || user.role === "admin") cards.push({ href: "/seller", icon: Store, t: "Maker desk", d: "Income, listings, SOS" });
 
   return (
     <ClientShell>
