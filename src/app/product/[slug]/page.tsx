@@ -5,6 +5,7 @@ import { inr, usd, parseJson, plain } from "@/lib/utils";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import BuyBox from "./BuyBox";
+import Remember from "./Remember";
 
 export const dynamic = "force-dynamic";
 
@@ -33,6 +34,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
 
   return (
     <StoreShell>
+      <Remember id={p.id} name={p.name} slug={p.slug} image={p.image} price={p.price} />
       <div className="max-w-7xl mx-auto px-4 py-6">
         <p className="text-xs text-maroon-500 mb-4">
           <Link href="/">INDIVA</Link> › <Link href={`/shop?category=${p.category_slug}`}>{p.category_name}</Link> › {p.state_name}

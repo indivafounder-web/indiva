@@ -1,5 +1,9 @@
+"use client";
 import Link from "next/link";
 import { inr, deliveryEta } from "@/lib/utils";
+import { addToCart, toast } from "./Experience";
+import { Heart, ShoppingCart } from "lucide-react";
+import { useState } from "react";
 
 export type ProductLite = {
   id: number;
@@ -19,13 +23,34 @@ export type ProductLite = {
 
 export default function ProductCard({ p, compact = false }: { p: ProductLite; compact?: boolean }) {
   const off = p.mrp > p.price ? Math.round((1 - p.price / p.mrp) * 100) : 0;
+  const [busy, setBusy] = useState(false);
+
+  async function quick(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    setBusy(true);
+    await addToCart(p.id, 1);
+    setBusy(false);
+  }
+
+  async function wish(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    await fetch("/api/wishlist", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ product_id: p.id }),
+    });
+    toast("Saved to wishlist");
+  }
+
   return (
     <Link
       href={`/product/${p.slug}`}
-      className="group flex flex-col bg-white border border-maroon-100 rounded-xl overflow-hidden hover:shadow-lift transition-shadow"
+      className="group flex flex-col bg-white border border-maroon-100 rounded-xl overflow-hidden card-lift gold-sheen"
     >
       <div className="relative aspect-square bg-cream-200 overflow-hidden">
-        <img src={p.image} alt={p.name} className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500" />
+        <img src={p.image} alt={p.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
         {p.gi_tagged ? (
           <span className="absolute top-2 left-2 text-[10px] tracking-wider uppercase bg-maroon-700 text-gold-200 px-2 py-1 rounded">
             GI Tagged
@@ -36,6 +61,19 @@ export default function ProductCard({ p, compact = false }: { p: ProductLite; co
             Tier 1
           </span>
         ) : null}
+        {off > 0 ? (
+          <span className="absolute bottom-2 left-2 text-[11px] font-semibold bg-red-700 text-white px-2 py-0.5 rounded-full">
+            −{off}%
+          </span>
+        ) : null}
+        <div className="absolute inset-x-2 bottom-2 flex gap-2 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all">
+          <button onClick={quick} disabled={busy} className="flex-1 py-2 rounded-full bg-gold-400 text-maroon-900 text-xs font-semibold flex items-center justify-center gap-1">
+            <ShoppingCart size={14} /> {busy ? "Adding…" : "Add to cart"}
+          </button>
+          <button onClick={wish} className="w-9 h-9 rounded-full bg-white text-maroon-800 flex items-center justify-center" aria-label="Wishlist">
+            <Heart size={14} />
+          </button>
+        </div>
       </div>
       <div className={`flex flex-col gap-1 ${compact ? "p-2.5" : "p-3.5"}`}>
         <p className="text-[11px] uppercase tracking-wider text-maroon-500">

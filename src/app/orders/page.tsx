@@ -35,6 +35,15 @@ function Inner() {
                 ))}
               </ul>
               <p className="text-right font-semibold mt-3">{inr(o.total)}</p>
+              <ol className="mt-4 grid grid-cols-4 gap-1 text-[10px] uppercase tracking-wider">
+                {["confirmed", "packed", "shipped", "delivered"].map((s, i) => {
+                  const order = ["confirmed", "packed", "shipped", "delivered"];
+                  const on = order.indexOf(o.status) >= i || o.status === "delivered";
+                  return (
+                    <li key={s} className={`text-center py-1 rounded ${on ? "bg-maroon-700 text-gold-200" : "bg-cream-200 text-maroon-400"}`}>{s}</li>
+                  );
+                })}
+              </ol>
             </article>
           ))}
         </div>

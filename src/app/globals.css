@@ -15,9 +15,7 @@ html, body {
   font-family: Outfit, system-ui, sans-serif;
 }
 
-body {
-  min-height: 100dvh;
-}
+body { min-height: 100dvh; }
 
 .font-display { font-family: "Playfair Display", Georgia, serif; }
 .font-script { font-family: "Cormorant Garamond", Georgia, serif; }
@@ -37,15 +35,119 @@ body {
 .hide-scroll::-webkit-scrollbar { display: none; }
 .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
 
-.no-print { }
-
 input, select, textarea { outline: none; }
 
-.stars {
-  color: #c4a35a;
-  letter-spacing: 1px;
-}
+.stars { color: #c4a35a; letter-spacing: 1px; }
 
 @media (max-width: 767px) {
   .pb-tab { padding-bottom: 5.5rem; }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(22px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes kenburns {
+  from { transform: scale(1.08) translate3d(0, 0, 0); }
+  to { transform: scale(1) translate3d(-1%, 1%, 0); }
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes pulse-gold {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(196, 163, 90, 0.55); }
+  70% { box-shadow: 0 0 0 12px rgba(196, 163, 90, 0); }
+}
+@keyframes cart-pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.28); }
+  100% { transform: scale(1); }
+}
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes ticker {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(16px) scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes lotus-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-fade-up { animation: fade-up 0.7s ease both; }
+.animate-fade-in { animation: fade-in 0.5s ease both; }
+.delay-1 { animation-delay: 0.12s; }
+.delay-2 { animation-delay: 0.24s; }
+.delay-3 { animation-delay: 0.36s; }
+.delay-4 { animation-delay: 0.48s; }
+
+.kenburns { animation: kenburns 18s ease-out forwards; }
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 32s linear infinite;
+}
+.marquee-track:hover { animation-play-state: paused; }
+
+.shimmer {
+  background: linear-gradient(90deg, #efe4d3 0%, #fbf7f0 50%, #efe4d3 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease infinite;
+}
+
+.btn-pulse { animation: pulse-gold 2.2s ease-out infinite; }
+.cart-pop { animation: cart-pop 0.45s ease; }
+.float-y { animation: float-y 4s ease-in-out infinite; }
+
+.ticker-track {
+  display: flex;
+  width: max-content;
+  animation: ticker 28s linear infinite;
+}
+
+.toast-in { animation: toast-in 0.35s ease both; }
+
+.card-lift {
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+.card-lift:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 22px 50px -18px rgba(84, 31, 20, 0.28);
+}
+
+.gold-sheen {
+  position: relative;
+  overflow: hidden;
+}
+.gold-sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.28) 50%, transparent 70%);
+  transform: translateX(-120%);
+  transition: transform 0.7s ease;
+}
+.gold-sheen:hover::after { transform: translateX(120%); }
+
+.progress-bar {
+  position: fixed;
+  top: 0; left: 0; height: 3px; z-index: 80;
+  background: linear-gradient(90deg, #c4a35a, #6b2c1a);
+  transform-origin: left;
 }

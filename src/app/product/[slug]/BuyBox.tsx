@@ -2,7 +2,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { inr, deliveryEta } from "@/lib/utils";
-import { Heart, ShieldCheck, Truck } from "lucide-react";
+import { Heart, ShieldCheck, Truck, Zap } from "lucide-react";
+import { addToCart, toast } from "@/components/Experience";
 
 export default function BuyBox({ p }: { p: any }) {
   const [qty, setQty] = useState(1);
@@ -12,21 +13,15 @@ export default function BuyBox({ p }: { p: any }) {
 
   async function add() {
     setBusy(true);
-    const r = await fetch("/api/cart", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ product_id: p.id, qty }),
-    });
+    const ok = await addToCart(p.id, qty);
     setBusy(false);
-    if (r.ok) {
-      setMsg("Added to cart");
-      router.refresh();
-    } else setMsg("Could not add");
+    setMsg(ok ? "Added to cart" : "Could not add");
+    if (ok) router.refresh();
   }
 
   async function buy() {
     await add();
-    router.push("/cart");
+    router.push("/checkout");
   }
 
   async function wish() {
@@ -35,15 +30,19 @@ export default function BuyBox({ p }: { p: any }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ product_id: p.id }),
     });
+    toast("Saved to wishlist");
     setMsg("Saved to wishlist");
   }
 
   return (
-    <aside className="border border-maroon-200 rounded-2xl p-4 bg-white h-fit lg:sticky lg:top-28">
+    <aside className="border border-maroon-200 rounded-2xl p-4 bg-white h-fit lg:sticky lg:top-28 shadow-soft animate-fade-up">
       <p className="text-2xl font-semibold">{inr(p.price)}</p>
       <p className="text-sm text-emerald-700 mt-1">FREE delivery {deliveryEta(5)} on orders over ₹1,999</p>
       <p className="text-sm mt-1">{p.stock > 0 ? <span className="text-emerald-800">In stock ({p.stock})</span> : <span className="text-red-700">Currently unavailable</span>}</p>
       <p className="text-xs text-maroon-600 mt-2">Ships from & sold by INDIVA · Fulfilled from {p.warehouse}</p>
+      <p className="mt-3 text-xs flex items-center gap-1 text-maroon-800 bg-gold-100 rounded-lg px-2 py-1">
+        <Zap size={12} /> Lightning deal · Atelier members check out first
+      </p>
       <label className="block text-sm mt-4">
         Quantity
         <select value={qty} onChange={(e) => setQty(Number(e.target.value))} className="mt-1 w-full border border-maroon-200 rounded-lg px-2 py-2 bg-cream-50">
@@ -52,8 +51,8 @@ export default function BuyBox({ p }: { p: any }) {
           ))}
         </select>
       </label>
-      <button onClick={add} disabled={busy} className="mt-4 w-full py-2.5 rounded-full bg-gold-400 text-maroon-900 font-semibold">
-        Add to Cart
+      <button onClick={add} disabled={busy} className="mt-4 w-full py-2.5 rounded-full bg-gold-400 text-maroon-900 font-semibold btn-pulse">
+        {busy ? "Adding…" : "Add to Cart"}
       </button>
       <button onClick={buy} className="mt-2 w-full py-2.5 rounded-full bg-orange-500 text-white font-semibold">
         Buy Now

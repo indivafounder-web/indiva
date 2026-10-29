@@ -1,6 +1,7 @@
 import Header from "./Header";
 import Footer from "./Footer";
 import MobileTabBar from "./MobileTabBar";
+import Experience from "./Experience";
 import { getSession, sidFromCookies } from "@/lib/auth";
 import { one } from "@/lib/db";
 
@@ -22,6 +23,7 @@ export default async function StoreShell({ children }: { children: React.ReactNo
       <main className="flex-1 pb-tab">{children}</main>
       <Footer />
       <MobileTabBar cartCount={cartCount} />
+      <Experience />
     </div>
   );
 }

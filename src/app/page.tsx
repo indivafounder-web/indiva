@@ -2,7 +2,8 @@ import Link from "next/link";
 import StoreShell from "@/components/StoreShell";
 import ProductCard from "@/components/ProductCard";
 import { q } from "@/lib/db";
-import { MapPin, ShieldCheck, Leaf, Globe2, QrCode, Sparkles } from "lucide-react";
+import { ShieldCheck, Leaf, Globe2, QrCode, Sparkles } from "lucide-react";
+import { RecentlyViewed, DealClock } from "@/components/Experience";
 
 export const dynamic = "force-dynamic";
 
@@ -28,20 +29,20 @@ export default async function Home() {
 
   return (
     <StoreShell>
-      <section className="relative min-h-[78vh] flex items-center">
-        <img src="/brand/hero.jpg" alt="" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-r from-maroon-900/80 via-maroon-900/50 to-transparent" />
+      <section className="relative min-h-[82vh] flex items-center overflow-hidden">
+        <img src="/brand/hero.jpg" alt="" className="absolute inset-0 w-full h-full object-cover kenburns" />
+        <div className="absolute inset-0 bg-gradient-to-r from-maroon-900/85 via-maroon-900/55 to-transparent" />
         <div className="relative max-w-7xl mx-auto px-6 py-24 text-cream-50">
-          <p className="uppercase tracking-[0.35em] text-gold-200 text-xs mb-4">Essence of Every State</p>
-          <h1 className="font-display text-4xl sm:text-6xl leading-tight max-w-xl">
+          <p className="uppercase tracking-[0.35em] text-gold-200 text-xs mb-4 animate-fade-up">Essence of Every State</p>
+          <h1 className="font-display text-4xl sm:text-6xl leading-tight max-w-xl animate-fade-up delay-1">
             Discover India&apos;s<br />
             <span className="italic text-gold-200">Finest Crafts</span>
           </h1>
-          <p className="mt-5 max-w-lg text-cream-100/90 text-lg">
+          <p className="mt-5 max-w-lg text-cream-100/90 text-lg animate-fade-up delay-2">
             Authentic handcrafts, wellness, décor and foods from all 29 states. Each piece carries a story — and a QR passport of the artisan who made it.
           </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/shop" className="px-6 py-3 rounded-full bg-gradient-to-r from-orange-500 to-gold-400 text-maroon-900 font-semibold">
+          <div className="mt-8 flex flex-wrap gap-3 animate-fade-up delay-3">
+            <Link href="/shop" className="px-6 py-3 rounded-full bg-gradient-to-r from-orange-500 to-gold-400 text-maroon-900 font-semibold btn-pulse">
               Shop Now →
             </Link>
             <Link href="/states" className="px-6 py-3 rounded-full bg-white/15 backdrop-blur border border-white/30">
@@ -54,8 +55,8 @@ export default async function Home() {
               ["500+", "Products"],
               ["10,000+", "Artisans"],
               ["70–80%", "To the maker"],
-            ].map(([n, l]) => (
-              <div key={l}>
+            ].map(([n, l], i) => (
+              <div key={l} className={`animate-fade-up delay-${i + 1}`}>
                 <dt className="font-display text-3xl text-gold-200">{n}</dt>
                 <dd className="text-sm text-cream-200">{l}</dd>
               </div>
@@ -63,6 +64,16 @@ export default async function Home() {
           </dl>
         </div>
       </section>
+
+      <div className="bg-maroon-900 text-gold-200 overflow-hidden py-3">
+        <div className="marquee-track gap-12 text-sm tracking-wide">
+          {[0, 1].flatMap((k) =>
+            ["Kanjivaram · Tamil Nadu", "Pashmina · Kashmir", "Bandhani · Gujarat", "Kolhapuri · Maharashtra", "Madhubani · Bihar", "Blue pottery · Jaipur", "Muga silk · Assam", "Saffron · Pampore"].map((t) => (
+              <span key={k + t} className="px-4">{t}</span>
+            ))
+          )}
+        </div>
+      </div>
 
       <section className="bg-white border-y border-maroon-100">
         <div className="max-w-7xl mx-auto px-6 py-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-sm">
@@ -125,9 +136,9 @@ export default async function Home() {
       </section>
 
       <section className="max-w-7xl mx-auto px-6 pb-14">
-        <div className="flex items-end justify-between mb-6">
-          <h2 className="font-display text-3xl">Today&apos;s <span className="italic text-gold-600">deals</span></h2>
-          <Link href="/shop?sort=price_asc" className="text-sm text-maroon-700">See more →</Link>
+        <div className="flex items-end justify-between mb-6 gap-3 flex-wrap">
+          <h2 className="font-display text-3xl">Lightning <span className="italic text-gold-600">deals</span></h2>
+          <p className="text-sm text-maroon-700">Ends in <DealClock /> · <Link href="/shop?sort=price_asc">See more →</Link></p>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {deals.map((p: any) => (
@@ -235,6 +246,19 @@ export default async function Home() {
               </div>
             </Link>
           ))}
+        </div>
+      </section>
+
+      <RecentlyViewed />
+
+      <section className="max-w-7xl mx-auto px-6 pb-10">
+        <div className="rounded-3xl bg-gradient-to-r from-maroon-800 to-maroon-600 text-cream-50 p-8 md:p-10 flex flex-wrap items-center justify-between gap-6">
+          <div>
+            <p className="text-xs tracking-[0.3em] uppercase text-gold-200">INDIVA Atelier</p>
+            <h2 className="font-display text-3xl mt-1">Beyond Prime. Belong to the house.</h2>
+            <p className="mt-2 text-cream-100/90 max-w-xl">Free festival shipping, early access to state-of-the-month, and artisan stories a week before the floor. Inclusive of every order over ₹2,999.</p>
+          </div>
+          <Link href="/register" className="px-6 py-3 rounded-full bg-gold-400 text-maroon-900 font-semibold">Join Atelier</Link>
         </div>
       </section>
 

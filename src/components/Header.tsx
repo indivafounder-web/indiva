@@ -55,14 +55,16 @@ export default function Header({
 
   return (
     <header className="sticky top-0 z-50">
-      <div className="bg-maroon-800 text-gold-200 text-[11px] tracking-wide">
-        <div className="max-w-7xl mx-auto px-4 h-8 flex items-center justify-between gap-4">
-          <p className="truncate">INDIVA Authentic · Plastic-free shipping · 70–80% to artisans · Export worldwide</p>
-          <div className="hidden sm:flex items-center gap-4">
-            <Link href="/about" className="hover:text-white">Our story</Link>
-            <Link href="/export" className="hover:text-white">Export</Link>
-            <Link href="/seller" className="hover:text-white">Sell with us</Link>
-            {user?.role === "admin" ? <Link href="/admin" className="hover:text-white">Super Admin</Link> : null}
+      <div className="bg-maroon-800 text-gold-200 text-[11px] tracking-wide overflow-hidden">
+        <div className="h-8 flex items-center">
+          <div className="ticker-track gap-10 px-4">
+            {[0, 1].flatMap((n) => [
+              <span key={n + "a"}>✦ INDIVA Authentic · GI tagged · Digital passport on every SKU</span>,
+              <span key={n + "b"}>Free delivery over ₹1,999 · Plastic-free packing</span>,
+              <span key={n + "c"}>70–80% to the artisan · No middlemen</span>,
+              <span key={n + "d"}>Export ready · US · UK · UAE · EU · JP</span>,
+              <span key={n + "e"}>This month: Gujarat — Threads & Thalis</span>,
+            ])}
           </div>
         </div>
       </div>
@@ -131,7 +133,7 @@ export default function Header({
             </Link>
             <Link href="/cart" className="relative p-2 hover:bg-white/10 rounded flex items-end gap-1">
               <ShoppingCart size={24} />
-              <span className="absolute top-0.5 left-5 min-w-[18px] h-[18px] rounded-full bg-gold-400 text-maroon-900 text-[11px] font-bold flex items-center justify-center">
+              <span className="absolute top-0.5 left-5 min-w-[18px] h-[18px] rounded-full bg-gold-400 text-maroon-900 text-[11px] font-bold flex items-center justify-center cart-pop">
                 {cartCount}
               </span>
               <span className="font-semibold hidden lg:inline">Cart</span>

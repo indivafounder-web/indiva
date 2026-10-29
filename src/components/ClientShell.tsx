@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
 import MobileTabBar from "./MobileTabBar";
+import Experience from "./Experience";
 
 export default function ClientShell({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<any>(null);
@@ -17,6 +18,7 @@ export default function ClientShell({ children }: { children: React.ReactNode })
       <main className="flex-1 pb-tab">{children}</main>
       <Footer />
       <MobileTabBar cartCount={cart} />
+      <Experience />
     </div>
   );
 }
