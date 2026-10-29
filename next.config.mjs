@@ -2,6 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  serverExternalPackages: ["pg", "mysql2", "mysql2/promise", "@libsql/client"],
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },

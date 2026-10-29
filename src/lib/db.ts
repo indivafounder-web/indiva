@@ -1,37 +1,103 @@
 import { createClient, type Client } from "@libsql/client";
 import fs from "fs";
 import path from "path";
-import { seedIfEmpty } from "./seed";
+import { seedIfEmpty, type SeedDb } from "./seed";
 
-function resolveUrl() {
-  if (process.env.TURSO_DATABASE_URL) return process.env.TURSO_DATABASE_URL;
+export type SqlEngine = "sqlite" | "turso" | "postgres" | "mysql";
+
+type PgPool = {
+  query: (sql: string, args?: any[]) => Promise<{ rows: any[]; rowCount?: number }>;
+};
+type MysqlPool = {
+  execute: (sql: string, args?: any[]) => Promise<any>;
+};
+
+let engine: SqlEngine = "sqlite";
+let engineLabel = "Local SQLite";
+let libsql: Client | null = null;
+let pg: PgPool | null = null;
+let mysql: MysqlPool | null = null;
+let detectedHost = "local file";
+
+function detect() {
+  const databaseUrl = (process.env.DATABASE_URL || "").trim();
+  const tursoUrl = (process.env.TURSO_DATABASE_URL || "").trim();
+  const url = databaseUrl || tursoUrl;
+
+  if (url.startsWith("postgres://") || url.startsWith("postgresql://")) {
+    engine = "postgres";
+    engineLabel = hostLabel(url, "PostgreSQL");
+    detectedHost = safeHost(url);
+    return { url, token: "" };
+  }
+  if (url.startsWith("mysql://") || url.startsWith("mysql2://")) {
+    engine = "mysql";
+    engineLabel = hostLabel(url, "MySQL");
+    detectedHost = safeHost(url);
+    return { url, token: "" };
+  }
+  if (tursoUrl || url.startsWith("libsql://") || url.startsWith("wss://") || url.startsWith("https://")) {
+    engine = "turso";
+    engineLabel = "Turso (libSQL)";
+    detectedHost = safeHost(tursoUrl || url);
+    return { url: tursoUrl || url, token: process.env.TURSO_AUTH_TOKEN || "" };
+  }
+  engine = "sqlite";
+  engineLabel = "Local SQLite";
   const dir = path.join(process.cwd(), "data");
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  return "file:" + path.join(dir, "indiva.db");
+  const file = path.join(dir, "indiva.db");
+  detectedHost = file;
+  return { url: "file:" + file, token: "" };
 }
 
-export const db: Client = createClient({
-  url: resolveUrl(),
-  authToken: process.env.TURSO_AUTH_TOKEN || undefined,
-});
-
-export async function q<T = any>(sql: string, args: any[] = []): Promise<T[]> {
-  await ensureDb();
-  const res = await db.execute({ sql, args });
-  return res.rows as unknown as T[];
+function safeHost(url: string) {
+  try {
+    const u = new URL(url.replace(/^libsql:/, "https:").replace(/^mysql2:/, "mysql:"));
+    return u.hostname;
+  } catch {
+    return "configured";
+  }
 }
 
-export async function run(sql: string, args: any[] = []) {
-  await ensureDb();
-  return db.execute({ sql, args });
+function hostLabel(url: string, base: string) {
+  const h = safeHost(url);
+  if (h.includes("neon.tech")) return "Neon PostgreSQL";
+  if (h.includes("supabase")) return "Supabase PostgreSQL";
+  if (h.includes("render.com")) return "Render PostgreSQL";
+  if (h.includes("railway")) return "Railway PostgreSQL";
+  if (h.includes("amazonaws.com")) return "AWS RDS";
+  if (h.includes("planetscale")) return "PlanetScale MySQL";
+  if (h.includes("tidbcloud")) return "TiDB Cloud";
+  return `${base} · ${h}`;
 }
 
-export async function one<T = any>(sql: string, args: any[] = []): Promise<T | null> {
-  const rows = await q<T>(sql, args);
-  return rows[0] || null;
+function pgPlaceholders(sql: string) {
+  let i = 0;
+  return sql.replace(/\?/g, () => `$${++i}`);
 }
 
-const SCHEMA = `
+function dialectSchema(raw: string) {
+  if (engine === "postgres") {
+    return raw
+      .replace(/INTEGER PRIMARY KEY AUTOINCREMENT/g, "SERIAL PRIMARY KEY")
+      .replace(/DEFAULT \(datetime\('now'\)\)/g, "DEFAULT (NOW()::text)")
+      .replace(/\bREAL\b/g, "DOUBLE PRECISION");
+  }
+  if (engine === "mysql") {
+    return raw
+      .replace(/INTEGER PRIMARY KEY AUTOINCREMENT/g, "INT AUTO_INCREMENT PRIMARY KEY")
+      .replace(/DEFAULT \(datetime\('now'\)\)/g, "DEFAULT (CURRENT_TIMESTAMP)")
+      .replace(/\bREAL\b/g, "DOUBLE")
+      .replace(/email TEXT UNIQUE NOT NULL/g, "email VARCHAR(191) UNIQUE NOT NULL")
+      .replace(/slug TEXT UNIQUE NOT NULL/g, "slug VARCHAR(191) UNIQUE NOT NULL")
+      .replace(/sku TEXT UNIQUE NOT NULL/g, "sku VARCHAR(64) UNIQUE NOT NULL")
+      .replace(/order_no TEXT UNIQUE NOT NULL/g, "order_no VARCHAR(64) UNIQUE NOT NULL");
+  }
+  return raw;
+}
+
+const SQLITE_SCHEMA = `
 CREATE TABLE IF NOT EXISTS users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
@@ -204,14 +270,94 @@ CREATE TABLE IF NOT EXISTS savings_tx (
 );
 `;
 
+async function openConnections() {
+  const { url, token } = detect();
+  if (engine === "postgres") {
+    const { Pool } = await import("pg");
+    pg = new Pool({
+      connectionString: url,
+      ssl: url.includes("localhost") || url.includes("127.0.0.1") ? false : { rejectUnauthorized: false },
+      max: 5,
+    }) as unknown as PgPool;
+    return;
+  }
+  if (engine === "mysql") {
+    const mysql2 = await import("mysql2/promise");
+    mysql = (await mysql2.createPool({
+      uri: url.replace(/^mysql2:/, "mysql:"),
+      ssl: url.includes("localhost") ? undefined : { rejectUnauthorized: false },
+    })) as unknown as MysqlPool;
+    return;
+  }
+  libsql = createClient({ url, authToken: token || undefined });
+}
+
+async function raw(sql: string, args: any[] = []): Promise<{ rows: any[]; lastInsertRowid: number }> {
+  if (!pg && !mysql && !libsql) await openConnections();
+  if (engine === "postgres" && pg) {
+    let statement = sql;
+    if (/^\s*INSERT/i.test(statement) && !/RETURNING/i.test(statement)) {
+      statement = statement.replace(/\s*;?\s*$/, "") + " RETURNING id";
+    }
+    const res = await pg.query(pgPlaceholders(statement), args);
+    const rows = res.rows || [];
+    return { rows, lastInsertRowid: Number(rows[0]?.id || 0) };
+  }
+  if (engine === "mysql" && mysql) {
+    const [res] = await mysql.execute(sql, args);
+    if (Array.isArray(res)) return { rows: res as any[], lastInsertRowid: 0 };
+    return { rows: [], lastInsertRowid: Number((res as any).insertId || 0) };
+  }
+  const res = await libsql!.execute({ sql, args });
+  return { rows: res.rows as any[], lastInsertRowid: Number(res.lastInsertRowid || 0) };
+}
+
+export async function q<T = any>(sql: string, args: any[] = []): Promise<T[]> {
+  await ensureDb();
+  const res = await raw(sql, args);
+  return res.rows as T[];
+}
+
+export async function run(sql: string, args: any[] = []) {
+  await ensureDb();
+  return raw(sql, args);
+}
+
+export async function one<T = any>(sql: string, args: any[] = []): Promise<T | null> {
+  const rows = await q<T>(sql, args);
+  return rows[0] || null;
+}
+
+export function getDbInfo() {
+  return {
+    engine,
+    label: engineLabel,
+    host: detectedHost,
+    persistent: engine !== "sqlite",
+    hint:
+      engine === "sqlite"
+        ? "Local file only — on Render this disk is wiped on each deploy. Set DATABASE_URL (Postgres) or TURSO_DATABASE_URL."
+        : `Writing to ${engineLabel}`,
+  };
+}
+
 let boot: Promise<void> | null = null;
 
 async function init() {
-  const statements = SCHEMA.split(";").map((s) => s.trim()).filter(Boolean);
+  await openConnections();
+  const schema = dialectSchema(SQLITE_SCHEMA);
+  const statements = schema.split(";").map((s) => s.trim()).filter(Boolean);
   for (const sql of statements) {
-    await db.execute(sql);
+    await raw(sql);
   }
-  await seedIfEmpty(db);
+  const seedClient: SeedDb = {
+    execute: async (stmt) => {
+      const sql = typeof stmt === "string" ? stmt : stmt.sql;
+      const args = typeof stmt === "string" ? [] : stmt.args || [];
+      return raw(sql, args);
+    },
+  };
+  await seedIfEmpty(seedClient);
 }
 
 export function ensureDb() {

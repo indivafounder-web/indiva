@@ -117,8 +117,15 @@ function Stat({ l, v }: { l: string; v: any }) {
 
 function Overview({ data }: { data: any }) {
   const s = data.stats;
+  const db = data.db || {};
   return (
     <div className="space-y-6">
+      <div className={`rounded-2xl p-4 border ${db.persistent ? "bg-emerald-900/30 border-emerald-500/30" : "bg-amber-900/30 border-amber-400/40"}`}>
+        <p className="text-[11px] uppercase tracking-wider text-gold-300">SQL database</p>
+        <p className="font-display text-xl mt-1">{db.label || "Local SQLite"}</p>
+        <p className="text-sm text-cream-200/80 mt-1">{db.host}</p>
+        <p className="text-xs mt-2 text-cream-300/80">{db.hint}</p>
+      </div>
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <Stat l="GMV" v={inr(s.revenue)} />
         <Stat l="Orders" v={s.orders} />

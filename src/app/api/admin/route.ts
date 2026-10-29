@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
-import { q, one, run } from "@/lib/db";
+import { q, one, run, getDbInfo } from "@/lib/db";
 
 async function admin() {
   const s = await getSession();
@@ -47,7 +47,7 @@ export async function GET() {
   );
   return NextResponse.json({
     stats, recentOrders, topProducts, artisans, sos, products, orders, customers,
-    warehouses, inventory, categories, states, salesByDay,
+    warehouses, inventory, categories, states, salesByDay, db: getDbInfo(),
   });
 }
 

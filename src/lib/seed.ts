@@ -1,10 +1,13 @@
-import type { Client } from "@libsql/client";
 import bcrypt from "bcryptjs";
+
+export type SeedDb = {
+  execute: (stmt: string | { sql: string; args?: any[] }) => Promise<{ rows: any[] }>;
+};
 
 const U = (id: string, w = 900) =>
   `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=80`;
 
-export async function seedIfEmpty(db: Client) {
+export async function seedIfEmpty(db: SeedDb) {
   const existing = await db.execute("SELECT COUNT(*) AS c FROM users");
   const c = Number((existing.rows[0] as any)?.c || 0);
   if (c > 0) return;
