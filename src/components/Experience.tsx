@@ -67,6 +67,7 @@ export default function Experience() {
   ]);
   const [input, setInput] = useState("");
   const [top, setTop] = useState(false);
+  const [prog, setProg] = useState(0);
 
   useEffect(() => {
     const add = (t: Toast) => {
@@ -74,7 +75,12 @@ export default function Experience() {
       setTimeout(() => setToasts((x) => x.filter((i) => i.id !== t.id)), 3200);
     };
     listeners.add(add);
-    const onScroll = () => setTop(window.scrollY > 500);
+    const onScroll = () => {
+      setTop(window.scrollY > 500);
+      const h = document.documentElement;
+      const max = h.scrollHeight - h.clientHeight;
+      setProg(max > 0 ? window.scrollY / max : 0);
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
       listeners.delete(add);
@@ -92,6 +98,7 @@ export default function Experience() {
 
   return (
     <>
+      <div className="progress-bar" style={{ transform: `scaleX(${prog})` }} />
       <div className="fixed bottom-20 md:bottom-6 right-4 z-50 flex flex-col items-end gap-2">
         {toasts.map((t) => (
           <div key={t.id} className="toast-in bg-maroon-800 text-cream-50 px-4 py-2.5 rounded-full shadow-lift text-sm max-w-xs">

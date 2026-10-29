@@ -1,43 +1,45 @@
 import Link from "next/link";
 import Logo from "./Logo";
+import { Lotus } from "./Ornament";
 
 export default function Footer() {
   return (
-    <footer className="mt-10 bg-[#232f3e] text-gray-200 text-sm">
-      <a href="#top" className="block text-center py-3 bg-[#37475a] hover:bg-[#485769] text-white text-sm">
-        Back to top
-      </a>
-      <div className="max-w-[1500px] mx-auto px-6 py-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+    <footer className="mt-16 bg-maroon-900 text-cream-100">
+      <div className="gold-line" />
+      <div className="max-w-7xl mx-auto px-6 py-14 grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
         <div>
           <Logo light />
-          <p className="mt-3 text-[#febd69] italic">One India. One Store. One Experience.</p>
-          <p className="mt-2 text-gray-400">Authentic crafts from every Indian state. GI tagged. Plastic-free packing.</p>
+          <p className="mt-4 font-script italic text-xl text-gold-200">One India. One Store. One Experience.</p>
+          <p className="mt-3 text-cream-200/80 text-sm leading-relaxed">
+            Authentic crafts from every Indian state. GI tagged. Plastic-free packing. 70–80% to the maker.
+          </p>
+          <Lotus className="w-16 mt-5 opacity-80" />
         </div>
         <div>
-          <h4 className="font-bold text-white mb-3">Shop</h4>
-          <ul className="space-y-1">
-            <li><Link href="/shop?category=fashion">Fashion & Textiles</Link></li>
-            <li><Link href="/shop?category=decor">Home & Décor</Link></li>
-            <li><Link href="/shop?category=gourmet">Gourmet</Link></li>
-            <li><Link href="/shop?category=wellness">Wellness</Link></li>
-            <li><Link href="/shop?category=lifestyle">Jewelry</Link></li>
-            <li><Link href="/states">Shop by State</Link></li>
-            <li><Link href="/hampers">Gift hampers</Link></li>
+          <h4 className="font-display tracking-[0.2em] text-gold-200 mb-4">Shop</h4>
+          <ul className="space-y-2 text-sm text-cream-100/85">
+            <li><Link href="/shop?category=fashion" className="hover:text-gold-200">Fashion & Textiles</Link></li>
+            <li><Link href="/shop?category=decor" className="hover:text-gold-200">Home & Décor</Link></li>
+            <li><Link href="/shop?category=gourmet" className="hover:text-gold-200">Gourmet</Link></li>
+            <li><Link href="/shop?category=wellness" className="hover:text-gold-200">Wellness</Link></li>
+            <li><Link href="/shop?category=lifestyle" className="hover:text-gold-200">Jewelry</Link></li>
+            <li><Link href="/states" className="hover:text-gold-200">Shop by State</Link></li>
+            <li><Link href="/hampers" className="hover:text-gold-200">Gift hampers</Link></li>
           </ul>
         </div>
         <div>
-          <h4 className="font-bold text-white mb-3">Help</h4>
-          <ul className="space-y-1">
-            <li><Link href="/tracking">Track a parcel</Link></li>
-            <li><Link href="/orders">Your orders</Link></li>
-            <li><Link href="/account">Your account</Link></li>
-            <li><Link href="/about">Our story</Link></li>
-            <li><Link href="/impact">Sustainability</Link></li>
+          <h4 className="font-display tracking-[0.2em] text-gold-200 mb-4">Help</h4>
+          <ul className="space-y-2 text-sm text-cream-100/85">
+            <li><Link href="/tracking" className="hover:text-gold-200">Track a parcel</Link></li>
+            <li><Link href="/orders" className="hover:text-gold-200">Your orders</Link></li>
+            <li><Link href="/account" className="hover:text-gold-200">Your account</Link></li>
+            <li><Link href="/about" className="hover:text-gold-200">Our story</Link></li>
+            <li><Link href="/impact" className="hover:text-gold-200">Sustainability</Link></li>
           </ul>
         </div>
         <div>
-          <h4 className="font-bold text-white mb-3">Trust</h4>
-          <ul className="space-y-1 text-gray-300">
+          <h4 className="font-display tracking-[0.2em] text-gold-200 mb-4">Trust</h4>
+          <ul className="space-y-2 text-sm text-cream-100/85">
             <li>GI-tagged authenticity</li>
             <li>Artisan story on every piece</li>
             <li>70–80% to the maker</li>
@@ -46,8 +48,8 @@ export default function Footer() {
           </ul>
         </div>
       </div>
-      <div className="border-t border-white/10 py-4 text-center text-xs text-gray-400">
-        © {new Date().getFullYear()} INDIVA
+      <div className="border-t border-gold-400/20 py-5 text-center text-xs tracking-[0.2em] uppercase text-gold-200/80">
+        © {new Date().getFullYear()} INDIVA · Essence of Every State
       </div>
     </footer>
   );

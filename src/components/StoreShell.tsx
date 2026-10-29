@@ -22,11 +22,11 @@ export default async function StoreShell({ children }: { children: React.ReactNo
     <div id="top" className="min-h-dvh flex flex-col">
       <Header user={user} cartCount={cartCount} />
       {settings.freeze_store === "1" ? (
-        <div className="bg-[#b12704] text-white text-center text-sm py-2 px-4">
+        <div className="bg-maroon-800 text-gold-200 text-center text-sm py-2 px-4 tracking-wide">
           Checkout is paused for a short while. You can still browse the collection.
         </div>
       ) : settings.announcement ? (
-        <div className="bg-[#232f3e] text-[#febd69] text-center text-sm py-2 px-4">{settings.announcement}</div>
+        <div className="bg-maroon-900 text-gold-200 text-center text-sm py-2 px-4">{settings.announcement}</div>
       ) : null}
       <main className="flex-1 pb-tab">{children}</main>
       <Footer />
