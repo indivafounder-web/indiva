@@ -1,20 +1,25 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { Search, ShoppingCart, User, Heart, MapPin, ChevronDown, Menu, X } from "lucide-react";
+import { Search, ShoppingCart, MapPin, ChevronDown, Menu, X, Mic } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Logo from "./Logo";
 
-const CATS = [
-  { href: "/shop?category=fashion", label: "Fashion & Textiles" },
+const DEPTS = [
+  { href: "/shop", label: "All" },
+  { href: "/shop?category=fashion", label: "Fashion" },
   { href: "/shop?category=decor", label: "Home & Décor" },
   { href: "/shop?category=gourmet", label: "Gourmet" },
   { href: "/shop?category=wellness", label: "Wellness" },
-  { href: "/shop?category=lifestyle", label: "Jewelry & Lifestyle" },
-  { href: "/states", label: "Shop by State" },
+  { href: "/shop?category=lifestyle", label: "Jewelry" },
+  { href: "/map", label: "29 States" },
   { href: "/shop?gi=1", label: "GI Tagged" },
-  { href: "/shop?tier=1", label: "Tier 1 Luxury" },
-  { href: "/export", label: "Export Desk" },
+  { href: "/hampers", label: "Hampers" },
+  { href: "/live", label: "Live workshops" },
+  { href: "/export", label: "Export" },
+  { href: "/b2b", label: "B2B" },
+  { href: "/atelier", label: "Atelier" },
+  { href: "/features", label: "All 100 features" },
 ];
 
 export default function Header({
@@ -28,6 +33,7 @@ export default function Header({
   const [sug, setSug] = useState<any[]>([]);
   const [open, setOpen] = useState(false);
   const [menu, setMenu] = useState(false);
+  const [dept, setDept] = useState("All");
   const box = useRef<HTMLFormElement>(null);
   const router = useRouter();
 
@@ -53,127 +59,142 @@ export default function Header({
     return () => window.removeEventListener("click", on);
   }, []);
 
+  function listen() {
+    const SR: any = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) {
+      router.push("/discover/voice-search");
+      return;
+    }
+    const rec = new SR();
+    rec.lang = "en-IN";
+    rec.onresult = (e: any) => {
+      const text = e.results[0][0].transcript;
+      setQ(text);
+      router.push("/shop?q=" + encodeURIComponent(text));
+    };
+    rec.start();
+  }
+
   return (
-    <header className="sticky top-0 z-50">
-      <div className="bg-maroon-800 text-gold-200 text-[11px] tracking-wide overflow-hidden">
-        <div className="h-8 flex items-center">
-          <div className="ticker-track gap-10 px-4">
-            {[0, 1].flatMap((n) => [
-              <span key={n + "a"}>✦ INDIVA Authentic · GI tagged · Digital passport on every SKU</span>,
-              <span key={n + "b"}>Free delivery over ₹1,999 · Plastic-free packing</span>,
-              <span key={n + "c"}>70–80% to the artisan · No middlemen</span>,
-              <span key={n + "d"}>Export ready · US · UK · UAE · EU · JP</span>,
-              <span key={n + "e"}>This month: Gujarat — Threads & Thalis</span>,
-            ])}
-          </div>
-        </div>
-      </div>
-      <div className="bg-maroon-700 text-cream-50">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 h-16 flex items-center gap-3">
-          <button className="md:hidden p-1" onClick={() => setMenu(true)} aria-label="Menu">
-            <Menu size={22} />
+    <header className="sticky top-0 z-50 text-white">
+      <div className="bg-[#131921]">
+        <div className="max-w-[1500px] mx-auto px-2 h-[60px] flex items-center gap-2">
+          <button className="md:hidden p-2" onClick={() => setMenu(true)} aria-label="Open menu">
+            <Menu />
           </button>
-          <Link href="/" className="shrink-0">
-            <Logo light size={30} />
+          <Link href="/" className="px-2 py-1 border border-transparent hover:border-white rounded-sm shrink-0">
+            <Logo light size={26} />
+          </Link>
+          <Link href="/map" className="hidden lg:flex items-center gap-1 px-2 py-1 border border-transparent hover:border-white rounded-sm min-w-[140px]">
+            <MapPin size={16} />
+            <span className="leading-tight">
+              <span className="block text-[11px] text-gray-300">Deliver to</span>
+              <span className="text-sm font-bold">India · 29 states</span>
+            </span>
           </Link>
           <form
             ref={box}
-            className="relative flex-1 max-w-3xl mx-auto"
+            className="relative flex-1 min-w-0"
             onSubmit={(e) => {
               e.preventDefault();
               setOpen(false);
               router.push("/shop?q=" + encodeURIComponent(q));
             }}
           >
-            <div className="flex rounded-md overflow-hidden bg-white text-ink">
-              <span className="hidden sm:flex items-center px-3 text-xs bg-cream-300 text-maroon-800 border-r border-maroon-100">
-                All
-              </span>
+            <div className="flex h-10 rounded overflow-hidden">
+              <select
+                value={dept}
+                onChange={(e) => setDept(e.target.value)}
+                className="hidden sm:block bg-[#e6e6e6] text-ink text-xs px-2 border-r border-gray-400"
+              >
+                {DEPTS.slice(0, 8).map((d) => (
+                  <option key={d.label}>{d.label}</option>
+                ))}
+              </select>
               <input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                placeholder="Search kanjivaram, pashmina, saffron, kolhapuri…"
-                className="flex-1 px-3 py-2 text-sm bg-transparent"
+                placeholder="Search INDIVA — kanjivaram, pashmina, GI crafts, artisans"
+                className="flex-1 px-3 text-ink text-sm"
               />
-              <button className="px-3 bg-gold-400 text-maroon-900" aria-label="Search">
-                <Search size={18} />
+              <button type="button" onClick={listen} className="px-2 bg-white text-maroon-800" aria-label="Voice search">
+                <Mic size={16} />
+              </button>
+              <button className="px-3 bg-[#febd69] text-ink" aria-label="Search">
+                <Search size={20} />
               </button>
             </div>
             {open && sug.length > 0 ? (
-              <ul className="absolute z-50 mt-1 w-full bg-white text-ink rounded-md shadow-lift border border-maroon-100 overflow-hidden">
-                {sug.slice(0, 7).map((p) => (
+              <ul className="absolute z-50 mt-1 w-full bg-white text-ink rounded-b shadow-lift overflow-hidden">
+                {sug.slice(0, 8).map((p) => (
                   <li key={p.id}>
-                    <Link
-                      href={`/product/${p.slug}`}
-                      className="flex items-center gap-3 px-3 py-2 hover:bg-cream-200 text-sm"
-                      onClick={() => setOpen(false)}
-                    >
+                    <Link href={`/product/${p.slug}`} className="flex items-center gap-3 px-3 py-2 hover:bg-[#eee] text-sm" onClick={() => setOpen(false)}>
                       <img src={p.image} alt="" className="w-9 h-9 object-cover rounded" />
                       <span className="flex-1 truncate">{p.name}</span>
-                      <span className="text-maroon-600 text-xs">₹{p.price}</span>
+                      <span className="text-xs">₹{p.price}</span>
                     </Link>
                   </li>
                 ))}
               </ul>
             ) : null}
           </form>
-          <div className="hidden md:flex items-center gap-1 text-sm">
-            <Link href="/account" className="px-2 py-1 hover:bg-white/10 rounded leading-tight">
-              <span className="block text-[11px] text-gold-200">Hello, {user ? user.name.split(" ")[0] : "sign in"}</span>
-              <span className="font-semibold flex items-center gap-1">
-                Account <ChevronDown size={12} />
-              </span>
-            </Link>
-            <Link href="/orders" className="px-2 py-1 hover:bg-white/10 rounded leading-tight">
-              <span className="block text-[11px] text-gold-200">Returns</span>
-              <span className="font-semibold">& Orders</span>
-            </Link>
-            <Link href="/wishlist" className="p-2 hover:bg-white/10 rounded" aria-label="Wishlist">
-              <Heart size={22} />
-            </Link>
-            <Link href="/cart" className="relative p-2 hover:bg-white/10 rounded flex items-end gap-1">
-              <ShoppingCart size={24} />
-              <span className="absolute top-0.5 left-5 min-w-[18px] h-[18px] rounded-full bg-gold-400 text-maroon-900 text-[11px] font-bold flex items-center justify-center cart-pop">
-                {cartCount}
-              </span>
-              <span className="font-semibold hidden lg:inline">Cart</span>
-            </Link>
-          </div>
-          <Link href="/cart" className="md:hidden relative p-1">
-            <ShoppingCart size={22} />
-            <span className="absolute -top-1 -right-1 min-w-[16px] h-4 rounded-full bg-gold-400 text-maroon-900 text-[10px] font-bold flex items-center justify-center">
-              {cartCount}
-            </span>
+          <Link href="/export" className="hidden xl:block px-2 py-1 border border-transparent hover:border-white rounded-sm text-sm leading-tight">
+            <span className="block text-[11px] text-gray-300">Language</span>
+            <span className="font-bold">EN · INR</span>
+          </Link>
+          <Link href={user ? "/account" : "/login"} className="hidden md:block px-2 py-1 border border-transparent hover:border-white rounded-sm leading-tight min-w-[120px]">
+            <span className="block text-[11px] text-gray-300">Hello, {user ? user.name.split(" ")[0] : "sign in"}</span>
+            <span className="font-bold text-sm flex items-center">Account & Lists <ChevronDown size={12} /></span>
+          </Link>
+          <Link href="/orders" className="hidden md:block px-2 py-1 border border-transparent hover:border-white rounded-sm leading-tight">
+            <span className="block text-[11px] text-gray-300">Returns</span>
+            <span className="font-bold text-sm">& Orders</span>
+          </Link>
+          <Link href="/cart" className="relative flex items-end gap-1 px-2 py-1 border border-transparent hover:border-white rounded-sm">
+            <ShoppingCart size={28} />
+            <span className="absolute top-0 left-5 text-[#f08804] font-bold text-sm">{cartCount}</span>
+            <span className="font-bold hidden sm:inline">Cart</span>
           </Link>
         </div>
       </div>
-      <div className="bg-maroon-800 text-cream-100 text-sm">
-        <div className="max-w-7xl mx-auto px-3 h-10 hidden md:flex items-center gap-5 overflow-x-auto hide-scroll">
-          <span className="flex items-center gap-1 text-gold-200 shrink-0">
-            <MapPin size={14} /> Deliver to India
-          </span>
-          {CATS.map((c) => (
-            <Link key={c.href} href={c.href} className="shrink-0 hover:text-white">
-              {c.label}
+      <div className="bg-[#232f3e] text-sm">
+        <div className="max-w-[1500px] mx-auto px-2 h-9 flex items-center gap-4 overflow-x-auto hide-scroll">
+          <button onClick={() => setMenu(true)} className="flex items-center gap-1 font-bold shrink-0">
+            <Menu size={16} /> All
+          </button>
+          {DEPTS.map((d) => (
+            <Link key={d.href} href={d.href} className="shrink-0 hover:underline">
+              {d.label}
             </Link>
           ))}
+          {user?.role === "admin" ? <Link href="/admin" className="shrink-0 text-[#febd69]">Super Admin</Link> : null}
+          {user?.role === "seller" ? <Link href="/seller" className="shrink-0 text-[#febd69]">Seller</Link> : null}
         </div>
       </div>
 
       {menu ? (
-        <div className="fixed inset-0 z-[60] md:hidden">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setMenu(false)} />
-          <aside className="absolute left-0 top-0 bottom-0 w-[82%] max-w-xs bg-cream-50 text-ink p-5 overflow-y-auto">
-            <div className="flex items-center justify-between mb-6">
-              <Logo />
+        <div className="fixed inset-0 z-[70]">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setMenu(false)} />
+          <aside className="absolute left-0 top-0 bottom-0 w-[86%] max-w-sm bg-white text-ink overflow-y-auto">
+            <div className="bg-[#232f3e] text-white px-4 py-4 flex justify-between items-center">
+              <p className="font-bold">Hello, {user ? user.name : "sign in"}</p>
               <button onClick={() => setMenu(false)}><X /></button>
             </div>
-            <p className="text-sm text-maroon-600 mb-3">{user ? `Hello, ${user.name}` : "Hello, guest"}</p>
-            <nav className="flex flex-col gap-1 text-[15px]">
-              {[{ href: "/", label: "Home" }, ...CATS, { href: "/about", label: "About INDIVA" }, { href: "/account", label: "Account" }, { href: "/seller", label: "Seller app" }].map((c) => (
-                <Link key={c.href} href={c.href} onClick={() => setMenu(false)} className="py-2 border-b border-maroon-100">
-                  {c.label}
+            <nav className="p-4 text-sm">
+              <p className="font-bold mb-2">Shop by Department</p>
+              {DEPTS.map((d) => (
+                <Link key={d.href} href={d.href} onClick={() => setMenu(false)} className="block py-2 border-b border-gray-100">
+                  {d.label}
                 </Link>
+              ))}
+              <p className="font-bold mt-4 mb-2">Programmes</p>
+              {[
+                ["/features", "100 future-ready features"],
+                ["/seller", "Sell on INDIVA"],
+                ["/impact", "Impact & ESG"],
+                ["/about", "Our movement"],
+              ].map(([h, l]) => (
+                <Link key={h} href={h} onClick={() => setMenu(false)} className="block py-2 border-b border-gray-100">{l}</Link>
               ))}
             </nav>
           </aside>

@@ -75,6 +75,21 @@ export default async function Home() {
         </div>
       </div>
 
+      <section className="max-w-[1500px] mx-auto px-4 -mt-10 relative z-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-4 pb-8">
+        {[
+          ["/map", "/brand/month-gujarat.jpg", "Shop by 29 states", "Open the cultural atlas"],
+          ["/shop?gi=1", "/brand/cat-fashion.jpg", "GI tagged originals", "Passports on every SKU"],
+          ["/hampers", "/brand/cat-gourmet.jpg", "Festive hampers", "Build a gift in minutes"],
+          ["/live", "/brand/artisan.jpg", "Live from the loom", "Watch makers at work"],
+        ].map(([h, img, t, d]) => (
+          <Link key={t} href={h} className="bg-white p-4 shadow-soft hover:shadow-lift">
+            <h3 className="font-semibold text-lg mb-2">{t}</h3>
+            <img src={img} alt="" className="w-full h-36 object-cover" />
+            <p className="text-sm text-[#007185] mt-2">{d}</p>
+          </Link>
+        ))}
+      </section>
+
       <section className="bg-white border-y border-maroon-100">
         <div className="max-w-7xl mx-auto px-6 py-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-sm">
           {[
