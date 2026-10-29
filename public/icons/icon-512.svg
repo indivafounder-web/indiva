@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#6b2c1a"/>
+  <g fill="none" stroke="#e8d5a3" stroke-width="10" stroke-linecap="round">
+    <path d="M256 110c22 38 50 60 84 70-34 10-62 32-84 70-22-38-50-60-84-70 34-10 62-32 84-70z"/>
+    <path d="M256 150c16 26 36 42 60 50-24 8-44 24-60 50-16-26-36-42-60-50 24-8 44-24 60-50z"/>
+  </g>
+  <circle cx="256" cy="200" r="16" fill="#e8d5a3"/>
+  <text x="256" y="400" text-anchor="middle" font-family="Georgia, serif" font-size="72" fill="#fbf7f0" letter-spacing="10">INDIVA</text>
+</svg>

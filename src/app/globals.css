@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --maroon: #6b2c1a;
+  --gold: #c4a35a;
+  --cream: #fbf7f0;
+  --ink: #1c120c;
+}
+
+html, body {
+  background: #fbf7f0;
+  color: #1c120c;
+  font-family: Outfit, system-ui, sans-serif;
+}
+
+body {
+  min-height: 100dvh;
+}
+
+.font-display { font-family: "Playfair Display", Georgia, serif; }
+.font-script { font-family: "Cormorant Garamond", Georgia, serif; }
+
+.mandala-bg {
+  background-color: #fbf7f0;
+  background-image:
+    radial-gradient(circle at 0% 0%, rgba(196, 163, 90, 0.12), transparent 42%),
+    radial-gradient(circle at 100% 0%, rgba(107, 44, 26, 0.08), transparent 40%);
+}
+
+.gold-line {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #c4a35a, transparent);
+}
+
+.hide-scroll::-webkit-scrollbar { display: none; }
+.hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+
+.no-print { }
+
+input, select, textarea { outline: none; }
+
+.stars {
+  color: #c4a35a;
+  letter-spacing: 1px;
+}
+
+@media (max-width: 767px) {
+  .pb-tab { padding-bottom: 5.5rem; }
+}
